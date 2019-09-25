@@ -33,7 +33,7 @@ class pdf_merger:
                 if reader.isEncrypted:
                     try:
                         reader.decrypt('')
-                        print('File Decrypted (PyPDF2)')
+                        logger.info('File Decrypted (PyPDF2)')
                     except:
                         command = ("cp "+ input_file +
                             " temp.pdf")
@@ -42,11 +42,11 @@ class pdf_merger:
                         os.system(command)
                         command = ("rm temp.pdf")
                         os.system(command)
-                        print('File Decrypted (qpdf)')
+                        logger.info('File Decrypted (qpdf)')
                         fp = open(input_file,'rb')
                         reader = PdfFileReader(fp)
                 else:
-                    print('File Not Encrypted')
+                    logger.info('File Not Encrypted')
                 for n in range(reader.getNumPages()):
                     writer.addPage(reader.getPage(n))      
 
