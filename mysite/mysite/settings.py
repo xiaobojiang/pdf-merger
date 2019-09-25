@@ -119,7 +119,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-
+APPEND_SLASH = False
 
 
 #logging [%(threadName)s:%(thread)d] [%(name)s:%(lineno)d]
@@ -168,7 +168,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['default'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False
         },
         'django.request': {
@@ -183,3 +183,6 @@ LOGGING = {
         },
     }
 }
+
+if DEBUG and os.environ.get('RUN_MAIN', None) != 'true':
+    LOGGING = {}

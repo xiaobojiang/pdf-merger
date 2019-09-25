@@ -10,6 +10,7 @@ import logging
 from modules.pdf_merger import pdf_merger
 from modules.data_model import general_response
 from errorcodes.errCodes import errCodes
+import glob
 
 logger = logging.getLogger('scripts')
 
@@ -74,6 +75,39 @@ def merge_pdf(request):
             response['code']=errCodes.ERROR_CONTENT_EMPTY.value
             response['reason']='user multi-form and file key shall be files'
             return HttpResponse(json.dumps(response),content_type="application/json",status=400)
+    else:
+        response['code']=errCodes.ERROR_METHOD_NOT_ALLOWED.value
+        response['reason']='method only support post'
+        return HttpResponse(json.dumps(response),content_type="application/json", status=405)
+
+
+@csrf_exempt
+def purge_pdf(request):
+    response={}
+    if request.method == 'POST':
+        #clear the pdf files in the path: /files
+        base_files_path =  os.path.join(os.path.dirname(settings.BASE_DIR),'files')
+        number_removed = 0
+        file_name_list = []
+        try:
+            pdf_files = [f for f in glob.glob(base_files_path + '/*.pdf',recursive=True)]
+            for f in pdf_files:
+                file_name = os.path.basename(f)
+                os.remove(f)
+                number_removed += 1
+                file_name_list.append(file_name)
+            response['code']=errCodes.OK_CODE_BASE.value
+            data={}
+            data['number_removed'] = number_removed
+            data['file_names'] = file_name_list
+            response['data']=data
+            return HttpResponse(json.dumps(response),content_type="application/json",status=200)
+
+        except Exception as e:
+            response['code']=errCodes.ERROR_INTERNAL.value
+            response['reason']=str(e)
+            return HttpResponse(json.dumps(response),content_type="application/json",status=400)
+    
     else:
         response['code']=errCodes.ERROR_METHOD_NOT_ALLOWED.value
         response['reason']='method only support post'

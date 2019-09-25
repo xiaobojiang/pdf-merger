@@ -29,7 +29,7 @@ class pdf_merger:
             for input_file in input_files:
                 input_stream = open(input_file, 'rb')
                 reader = PdfFileReader(input_stream)
-                
+                input_streams.append(input_stream)
                 if reader.isEncrypted:
                     try:
                         reader.decrypt('')
@@ -48,7 +48,8 @@ class pdf_merger:
                 else:
                     print('File Not Encrypted')
                 for n in range(reader.getNumPages()):
-                    writer.addPage(reader.getPage(n))
+                    writer.addPage(reader.getPage(n))      
+
             with open(output_file, "wb") as fout:
                 writer.write(fout)
                 fout.close()
@@ -56,7 +57,7 @@ class pdf_merger:
             resp.set_payload(output_file)
         except Exception as e:
             resp.set_success(False)
-            resp.set_payload(e.message)
+            resp.set_payload(str(e))
             logger.error(e, exc_info=True)
         finally:
             for f in input_streams:
